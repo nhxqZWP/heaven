@@ -20,10 +20,7 @@ class TestController extends Controller
 
     public function testPing()
     {
-        $exchange = new \ccxt\binance (array (
-            'verbose' => true,
-            'timeout' => 30000,
-        ));
+        $exchange = new \ccxt\binance();
 
         try {
 
