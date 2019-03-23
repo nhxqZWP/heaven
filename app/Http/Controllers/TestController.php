@@ -22,8 +22,7 @@ class TestController extends Controller
     {
         $exchange = new \ccxt\binance (array (
             'verbose' => true,
-//            'timeout' => 30000,
-            'proxy' => "http://47.244.18.192:8888/"
+            'timeout' => 30000,
         ));
 
         try {
