@@ -59,7 +59,8 @@ class TestController extends Controller
             // 市场订单深度
             $symbol = 'BTC/USD';
             $result = $exchange->fetchOrderBook($symbol);
-            dd ($result);
+            return view('test.orderBookList', ['data' => $result]);
+//            dd ($result);
 
         } catch (\ccxt\NetworkError $e) {
             echo '[Network Error] ' . $e->getMessage () . "\n";
