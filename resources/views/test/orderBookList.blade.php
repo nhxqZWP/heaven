@@ -12,8 +12,9 @@
         <table class="table">
             @foreach($data['asks'] as $item)
                 <tr>
-                    <td style="color: blue">{{$item[0]}}</td>
-                    <td style="color: blue">{{$item[1]}}</td>
+                    <td style="color: blue;">{{$item[0]}}</td>
+                    <td style="color: blue; text-align: right">{{$item[1]}}</td>
+                    <td style="color: blue; text-align: right">{{$item[2]}}</td>
                 </tr>
             @endforeach
             @foreach($data['bids'] as $item)
@@ -26,7 +27,7 @@
         </table>
     </div>
     <div>
-        时间：{{date('Y-m-d H:i:s', time())}}
+        时间：{{date('Y-m-d H:i:s', strtotime('+ 8 hours'))}}
     </div>
 </body>
 </html>

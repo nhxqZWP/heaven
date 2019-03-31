@@ -59,12 +59,17 @@ class TestController extends Controller
             // 市场订单深度
             $symbol = 'BTC/USD';
             $result = $exchange->fetchOrderBook($symbol);
-            rsort($result['asks']);
             $sumAsk = 0; $sumBuy = 0;
+            foreach ($result['asks'] as &$ask) {
+                $sumAsk += $ask[1];
+                $ask[2] = $sumAsk;
+            }
             foreach ($result['bids'] as &$buy) {
                 $sumBuy += $buy[1];
                 $buy[2] = $sumBuy;
             }
+            rsort($result['asks']);
+
             return view('test.orderBookList', ['data' => $result]);
 //            dd ($result);
 
