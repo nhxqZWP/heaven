@@ -47,18 +47,18 @@ class TestController extends Controller
 
         try {
 
-            // bitmex交易对配置
-            $result = $exchange->fetchMarkets ();
-            $data = [];
-            foreach ($result as $item) {
-                $data[$item['id']] = $item;
-            }
-            print_r($data);
-            exit;
+            // 交易对配置
+//            $result = $exchange->fetchMarkets ();
+//            $data = [];
+//            foreach ($result as $item) {
+//                $data[$item['id']] = $item;
+//            }
+//            print_r($data);
+//            exit;
 
-            //
-//            $result = $exchange->fetchL2OrderBook();
-
+            // 市场订单深度
+            $symbol = 'BTC/USD';
+            $result = $exchange->fetchOrderBook($symbol);
             dd ($result);
 
         } catch (\ccxt\NetworkError $e) {
