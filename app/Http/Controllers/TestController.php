@@ -47,8 +47,14 @@ class TestController extends Controller
 
         try {
 
-            // bitmex交易对
+            // bitmex交易对配置
             $result = $exchange->fetchMarkets ();
+            $data = [];
+            foreach ($result as $item) {
+                $data[$item['id']] = $item;
+            }
+            dd($data);
+
             //
 //            $result = $exchange->fetchL2OrderBook();
 
