@@ -47,7 +47,10 @@ class TestController extends Controller
 
         try {
 
-            $result = $exchange->fetch_tickers ();
+            // bitmex交易对
+            $result = $exchange->fetchMarkets ();
+            //
+//            $result = $exchange->fetchL2OrderBook();
 
             dd ($result);
 
