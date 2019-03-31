@@ -10,10 +10,12 @@
 <body>
     <div>
         <table class="table">
-            <th>
-                <td>买单价格</td>
-                <td>订单量</td>
-            </th>
+            @foreach($data['asks'] as $item)
+                <tr>
+                    <td style="color: blue">{{$item[0]}}</td>
+                    <td style="color: blue">{{$item[1]}}</td>
+                </tr>
+            @endforeach
             @foreach($data['bids'] as $item)
             <tr>
                 <td style="color: crimson">{{$item[0]}}</td>
@@ -21,18 +23,9 @@
             </tr>
             @endforeach
         </table>
-        <table class="table">
-            <th>
-            <td>卖单价格</td>
-            <td>订单量</td>
-            </th>
-            @foreach($data['asks'] as $item)
-                <tr>
-                    <td style="color: blue">{{$item[0]}}</td>
-                    <td style="color: blue">{{$item[1]}}</td>
-                </tr>
-            @endforeach
-        </table>
+    </div>
+    <div>
+        时间：{{date('Y-m-d H:i:s', time())}}
     </div>
 </body>
 </html>
