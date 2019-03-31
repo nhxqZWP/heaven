@@ -15,7 +15,7 @@ class TestController extends Controller
 {
     public function test()
     {
-        return $this->testBitmexQuery();
+        return $this->testBitmexPrice();
     }
 
     public function testPing()
@@ -38,7 +38,7 @@ class TestController extends Controller
         }
     }
 
-    public function testBitmexQuery()
+    public function testBitmexOrderList()
     {
         $exchange = new \ccxt\bitmex(array (
             // 'verbose' => true, // for debugging
@@ -72,6 +72,29 @@ class TestController extends Controller
 
             return view('test.orderBookList', ['data' => $result]);
 //            dd ($result);
+
+        } catch (\ccxt\NetworkError $e) {
+            echo '[Network Error] ' . $e->getMessage () . "\n";
+        } catch (\ccxt\ExchangeError $e) {
+            echo '[Exchange Error] ' . $e->getMessage () . "\n";
+        } catch (Exception $e) {
+            echo '[Error] ' . $e->getMessage () . "\n";
+        }
+    }
+
+    public function testBitmexPrice()
+    {
+        $exchange = new \ccxt\bitmex(array (
+            // 'verbose' => true, // for debugging
+            'timeout' => 30000,
+        ));
+
+        try {
+
+            // 市场订单深度
+            $symbol = 'BTC/USD';
+            $result = $exchange->fetch_ohlcv($symbol);
+            dd($result);
 
         } catch (\ccxt\NetworkError $e) {
             echo '[Network Error] ' . $e->getMessage () . "\n";
