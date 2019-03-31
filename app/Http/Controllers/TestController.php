@@ -15,7 +15,7 @@ class TestController extends Controller
 {
     public function test()
     {
-        return $this->testBitmexPrice();
+        return $this->testBitmexOrderList();
     }
 
     public function testPing()
