@@ -60,6 +60,11 @@ class TestController extends Controller
             $symbol = 'BTC/USD';
             $result = $exchange->fetchOrderBook($symbol);
             rsort($result['asks']);
+            $sumAsk = 0; $sumBuy = 0;
+            foreach ($result['bids'] as $key => $buy) {
+                $sumBuy += $buy[1];
+                $buy[2] = $sumBuy;
+            }
             return view('test.orderBookList', ['data' => $result]);
 //            dd ($result);
 

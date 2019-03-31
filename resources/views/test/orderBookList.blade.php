@@ -20,6 +20,7 @@
             <tr>
                 <td style="color: crimson">{{$item[0]}}</td>
                 <td style="color: crimson">{{$item[1]}}</td>
+                <td style="color: crimson">{{$item[2]}}</td>
             </tr>
             @endforeach
         </table>
