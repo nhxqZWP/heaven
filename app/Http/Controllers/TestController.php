@@ -61,7 +61,7 @@ class TestController extends Controller
             $result = $exchange->fetchOrderBook($symbol);
             rsort($result['asks']);
             $sumAsk = 0; $sumBuy = 0;
-            foreach ($result['bids'] as $key => $buy) {
+            foreach ($result['bids'] as &$buy) {
                 $sumBuy += $buy[1];
                 $buy[2] = $sumBuy;
             }
