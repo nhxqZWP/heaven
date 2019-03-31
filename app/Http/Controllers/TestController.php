@@ -53,7 +53,8 @@ class TestController extends Controller
             foreach ($result as $item) {
                 $data[$item['id']] = $item;
             }
-            dd($data);
+            print_r($data);
+            exit;
 
             //
 //            $result = $exchange->fetchL2OrderBook();
