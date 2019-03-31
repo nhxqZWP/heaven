@@ -19,8 +19,8 @@
             @foreach($data['bids'] as $item)
             <tr>
                 <td style="color: crimson">{{$item[0]}}</td>
-                <td style="color: crimson">{{$item[1]}}</td>
-                <td style="color: crimson">{{$item[2]}}</td>
+                <td style="color: crimson; text-align: right">{{$item[1]}}</td>
+                <td style="color: crimson; text-align: right">{{$item[2]}}</td>
             </tr>
             @endforeach
         </table>
