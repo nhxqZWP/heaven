@@ -25,7 +25,7 @@ class TestController extends Controller
 
     public function test()
     {
-        return $this->getOpenPositions();
+        return $this->getOrderBook();
     }
 
     // 获取现价
@@ -49,18 +49,39 @@ class TestController extends Controller
         dd(json_encode($data));
     }
 
-    // 获取所有新的或部分成交单信息
+    // 获取所有New或PartiallyFilled成交单信息
     public function getOpenOrders()
     {
         $data = $this->client->getOpenOrders();
         dd(json_encode($data));
     }
 
+    // 获取btcusd的isOpen
     public function getOpenPositions()
     {
         $data = $this->client->getOpenPositions();
         dd($data);
     }
+
+    // 获取btcusd的
+    public function getPositions()
+    {
+        $data = $this->client->getPositions();
+        dd($data);
+    }
+
+    public function closePosition()
+    {
+        $data = $this->client->closePosition('');
+        dd($data);
+    }
+
+    public function getOrderBook()
+    {
+        $data = $this->client->getOrderBook();
+        dd($data);
+    }
+
 
 
 
