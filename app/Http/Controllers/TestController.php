@@ -31,7 +31,7 @@ class TestController extends Controller
     public function getTicker()
     {
         $data = $this->client->getTicker();
-        dd($data);
+        dd(json_encode($data));
     }
 
 
