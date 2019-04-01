@@ -15,7 +15,7 @@ class TestController extends Controller
 {
     public function test()
     {
-        return $this->testBitmexOrderList();
+        return $this->testBitmexBalance();
     }
 
     public function testPing()
@@ -41,7 +41,7 @@ class TestController extends Controller
     public function testBitmexOrderList()
     {
         $exchange = new \ccxt\bitmex(array (
-            // 'verbose' => true, // for debugging
+             'verbose' => true, // for debugging
             'timeout' => 30000,
         ));
 
@@ -108,23 +108,42 @@ class TestController extends Controller
     public function testBitmexOrder()
     {
         $exchange = new \ccxt\bitmex (array (
-            'apiKey' => 'YOUR_API_KEY', // ←------------ replace with your keys
-            'secret' => 'YOUR_SECRET',
+            'apiKey' => 'DQxJ-9ShAv9Ev3kJwX_1afAj',
+            'secret' => 'IUyx0qUYn7B27Qyqn9-T6HGOfKuZuu9LJ7nSQbKKs52fdmFp',
             'enableRateLimit' => true,
+            'urls' => [
+                'api' => 'https://testnet.bitmex.com'
+            ],
         ));
 
-        $symbol = 'XBTM18'; // bitcoin contract according to bitmex futures coding
+        $symbol = 'BTC/USD'; // bitcoin contract according to bitmex futures coding
         $type = 'StopLimit'; // # or 'market', or 'Stop' or 'StopLimit'
-        $side = 'sell'; // or 'buy'
+        $side = 'buy'; // or 'buy'
         $amount = 1.0;
-        $price = 6500.0; // or None
+        $price = 4000.0; // or None
 
         // extra params and overrides
         $params = array (
-            'stopPx' => 6000.0, // if needed
+            'stopPx' => 4200.0, // if needed
         );
 
         $order = $exchange->create_order ($symbol, $type, $side, $amount, $price, $params);
+        dd($order);
 
+    }
+
+    public function testBitmexBalance()
+    {
+        $exchange = new \ccxt\bitmex (array (
+            'apiKey' => 'DQxJ-9ShAv9Ev3kJwX_1afAj',
+            'secret' => 'IUyx0qUYn7B27Qyqn9-T6HGOfKuZuu9LJ7nSQbKKs52fdmFp',
+            'enableRateLimit' => true,
+//            'urls' => [
+//                'api' => 'https://testnet.bitmex.com'
+//            ],
+        ));
+
+        $balance = $exchange->fetch_balance();
+        dd($balance);
     }
 }
