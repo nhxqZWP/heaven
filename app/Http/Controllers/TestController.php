@@ -84,8 +84,11 @@ class TestController extends Controller
 
     public function createLimitOrder()
     {
-        $data = $this->client->createLimitOrder(1, 4000);
-        dd($data);
+        $res = $this->client->createLimitOrder(1, 4000);
+        if (!$res) {
+            dd($this->client->errorMessage);
+        }
+        dd($res);
     }
 
 
