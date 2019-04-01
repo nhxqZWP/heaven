@@ -11,6 +11,7 @@ namespace App\PlatformApi;
 
 class BitMexApi
 {
+    //exploer https://www.bitmex.com/api/explorer 所有接口
     //const API_URL = 'https://testnet.bitmex.com';
     const API_URL = 'https://www.bitmex.com';
     const API_PATH = '/api/v1/';
@@ -57,7 +58,7 @@ class BitMexApi
     public function getTicker() {
 
         $symbol = self::SYMBOL;
-        $data['function'] = "instrument";
+        $data['function'] = "instrument"; //平台的接口名
         $data['params'] = array(
             "symbol" => $symbol
         );

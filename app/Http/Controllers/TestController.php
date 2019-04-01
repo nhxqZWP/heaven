@@ -25,7 +25,7 @@ class TestController extends Controller
 
     public function test()
     {
-        return $this->getCandles();
+        return $this->getOpenPositions();
     }
 
     // 获取现价
@@ -35,10 +35,31 @@ class TestController extends Controller
         dd($data);
     }
 
+    // 获取K线历史数据
     public function getCandles()
     {
         $data = $this->client->getCandles('1h', 2);
         dd(json_encode($data));
+    }
+
+    // 获取某订单信息
+    public function getOrder()
+    {
+        $data = $this->client->getOrder('');
+        dd(json_encode($data));
+    }
+
+    // 获取所有新的或部分成交单信息
+    public function getOpenOrders()
+    {
+        $data = $this->client->getOpenOrders();
+        dd(json_encode($data));
+    }
+
+    public function getOpenPositions()
+    {
+        $data = $this->client->getOpenPositions();
+        dd($data);
     }
 
 

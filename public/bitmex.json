@@ -8,15 +8,28 @@
     "high": 4144.5,
     "low": 4036.5
   },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\": "tests/"
+  "getCandles": {
+    "1554130800": {
+      "timestamp": "2019-04-01 15:00:00",
+      "time": 1554130800,
+      "open": 4131.5,
+      "high": 4144.5,
+      "close": 4127.5,
+      "low": 4127
+    },
+    "1554134400": {
+      "timestamp": "2019-04-01 16:00:00",
+      "time": 1554134400,
+      "open": 4127.5,
+      "high": 4134,
+      "close": 4132,
+      "low": 4122.5
     }
   },
-  "extra": {
-    "laravel": {
-      "dont-discover": [
-      ]
-    }
+  "getOrder": {
+
+  },
+  "": {
+
   }
 }
