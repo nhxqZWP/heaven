@@ -12,8 +12,8 @@ namespace App\PlatformApi;
 class BitMexApi
 {
     //exploer https://www.bitmex.com/api/explorer 所有接口
-    //const API_URL = 'https://testnet.bitmex.com';
-    const API_URL = 'https://www.bitmex.com';
+    const API_URL = 'https://testnet.bitmex.com';
+//    const API_URL = 'https://www.bitmex.com';
     const API_PATH = '/api/v1/';
     const SYMBOL = 'XBTUSD';
 
@@ -351,7 +351,7 @@ class BitMexApi
      * Create new limit order
      *
      * @param $price number of contracts
-     * @param $quantity (number of contracts) positive for buy and negative for sell
+     * @param $quantity (number of contracts) positive for buy and negative for sell 买入为正，卖出为负
      * @param $maker forces platform to complete your order as a 'maker' only
      *
      * @return new order array

@@ -25,7 +25,7 @@ class TestController extends Controller
 
     public function test()
     {
-        return $this->getOrderBook();
+        return $this->createLimitOrder();
     }
 
     // 获取现价
@@ -79,6 +79,12 @@ class TestController extends Controller
     public function getOrderBook()
     {
         $data = $this->client->getOrderBook();
+        dd($data);
+    }
+
+    public function createLimitOrder()
+    {
+        $data = $this->client->createLimitOrder(1, 4000);
         dd($data);
     }
 
