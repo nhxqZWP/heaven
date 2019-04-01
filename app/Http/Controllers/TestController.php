@@ -37,8 +37,8 @@ class TestController extends Controller
 
     public function getCandles()
     {
-        $data = $this->client->getCandles('1h', 5);
-        dd($data);
+        $data = $this->client->getCandles('1h', 2);
+        dd(json_encode($data));
     }
 
 
