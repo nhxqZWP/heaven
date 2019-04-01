@@ -1,9 +1,13 @@
 {
   "name": "bitmex",
   "getTicker": {
-
+    "symbol": "XBTUSD",
+    "last": 4136.5,
+    "bid": 4136,
+    "ask": 4136.5,
+    "high": 4144.5,
+    "low": 4036.5
   },
-
   "autoload-dev": {
     "psr-4": {
       "Tests\\": "tests/"

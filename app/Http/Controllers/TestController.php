@@ -25,13 +25,20 @@ class TestController extends Controller
 
     public function test()
     {
-        return $this->getTicker();
+        return $this->getCandles();
     }
 
+    // 获取现价
     public function getTicker()
     {
         $data = $this->client->getTicker();
-        dd(json_encode($data));
+        dd($data);
+    }
+
+    public function getCandles()
+    {
+        $data = $this->client->getCandles('1h', 5);
+        dd($data);
     }
 
 
