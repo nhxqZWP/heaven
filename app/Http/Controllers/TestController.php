@@ -9,14 +9,47 @@
 namespace App\Http\Controllers;
 
 
+use App\PlatformApi\BitMexApi;
 use Exception;
 
 class TestController extends Controller
 {
+    private $client = null;
+    public function __construct()
+    {
+        $this->client = new BitMexApi(
+            'DQxJ-9ShAv9Ev3kJwX_1afAj',
+            'IUyx0qUYn7B27Qyqn9-T6HGOfKuZuu9LJ7nSQbKKs52fdmFp'
+        );
+    }
+
     public function test()
     {
-        return $this->testBitmexOrder();
+        return $this->getTicker();
     }
+
+    public function getTicker()
+    {
+        $data = $this->client->getTicker();
+        dd($data);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /** ------------------------------------------------------------ */
 
     public function testPing()
     {
