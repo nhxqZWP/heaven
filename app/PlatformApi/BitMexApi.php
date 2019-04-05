@@ -583,8 +583,8 @@ class BitMexApi
             $params = http_build_query($data['params']);
         }
         elseif($method == "DELETE") {
-//            $params = json_encode($data['params']);
-            $params = http_build_query($data['params']);
+            $params = json_encode($data['params']);
+//            $params = http_build_query($data['params']);
         }
         $path = self::API_PATH . $function;
         $url = self::API_URL . self::API_PATH . $function;
@@ -618,7 +618,7 @@ class BitMexApi
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
         }
         if($data['method'] == "DELETE") {
-            Log::debug(json_encode($post));
+//            Log::debug(json_encode($post));
             curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
             $headers[] = 'X-HTTP-Method-Override: DELETE';

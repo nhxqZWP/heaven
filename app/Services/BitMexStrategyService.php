@@ -270,7 +270,8 @@ class BitMexStrategyService
 
     private function _cancelBuyOrder()
     {
-        $res = $this->bitmex->cancelOrder($this->_getBuyOrderKey());
+        $orderId = Redis::get($this->_getBuyOrderKey());
+        $res = $this->bitmex->cancelOrder($orderId);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
             return false;
@@ -281,7 +282,8 @@ class BitMexStrategyService
 
     private function _cancelSellOrder()
     {
-        $res = $this->bitmex->cancelOrder($this->_getSellOrderKey());
+        $orderId = Redis::get($this->_getSellOrderKey());
+        $res = $this->bitmex->cancelOrder($orderId);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
             return false;
