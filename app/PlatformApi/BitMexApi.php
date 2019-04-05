@@ -9,6 +9,8 @@
 namespace App\PlatformApi;
 
 
+use Illuminate\Support\Facades\Log;
+
 class BitMexApi
 {
     //exploer https://www.bitmex.com/api/explorer 所有接口
@@ -616,6 +618,7 @@ class BitMexApi
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
         }
         if($data['method'] == "DELETE") {
+            Log::debug(json_encode($post));
             curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
             $headers[] = 'X-HTTP-Method-Override: DELETE';
