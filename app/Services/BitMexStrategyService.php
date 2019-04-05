@@ -27,8 +27,8 @@ class BitMexStrategyService
     public function __construct($key = 'BM1')
     {
         $this->primaryKey = $key;
-        $envKey = $key . 'KEY';
-        $envSecret = $key . 'SECRET';
+        $envKey = $key . '_KEY';
+        $envSecret = $key . '_SECRET';
         $this->bitmex = new BitMexApi(
             env($envKey),
             env($envSecret)
@@ -59,7 +59,7 @@ class BitMexStrategyService
     {
         $status = $this->_getStatus();
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
-            $res = $this->bitmex->createLimitOrder(100, 4900);
+            $res = $this->bitmex->createLimitOrder(100, 4000);
             if (!$res) {
                 dd($this->bitmex->errorMessage);
                 Log::error($this->bitmex->errorMessage);

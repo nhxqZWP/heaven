@@ -597,8 +597,6 @@ class BitMexApi
         if($data['method'] == "POST") {
             curl_setopt($this->ch, CURLOPT_POST, true);
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
-            $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-            $headers[] = 'Accept: application/json';
         }
         if($data['method'] == "DELETE") {
             curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -611,6 +609,7 @@ class BitMexApi
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
             $headers[] = 'X-HTTP-Method-Override: PUT';
         }
+        dd($headers);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER , false);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
