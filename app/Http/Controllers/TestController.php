@@ -25,7 +25,7 @@ class TestController extends Controller
 
     public function test()
     {
-        return $this->getWallet();
+        return $this->getOrderBook();
     }
 
     // 获取现价
