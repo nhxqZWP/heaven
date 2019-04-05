@@ -21,7 +21,8 @@ class BitMexStrategyService
     const STATUS_HAS_BUY_FINISHED = 3;
     const STATUS_HAS_SELL_NOT_FINISHED = 4;
 
-    const ORDER_STATUS_NEW = 'new';
+    const ORDER_STATUS_NEW = 'new'; //New
+    const ORDER_STATUS_FILLED = 'filled'; //Filled
 
     private $primaryKey;
     private $bitmex;
@@ -91,7 +92,7 @@ class BitMexStrategyService
             $orderId = $res['orderID'];
             Redis::set($this->_getSellOrderKey(), $orderId);
             //记录买单超时时间
-            $overTimeStamp = time() + 60 * 6;
+            $overTimeStamp = time() + 60 * 10;
             Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
             return null;
         } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
@@ -144,13 +145,18 @@ class BitMexStrategyService
             Log::error($this->bitmex->errorMessage);
             return false;
         }
+        //记录买单量
+        Redis::set($this->primaryKey . '_buy_order_quantity');
         return $res;
     }
 
     public function _createLimitSellOrder()
     {
         $price = -$this->_getBuyOrderPrice(); //此处买卖同价,卖单需要价格为负数！！
-        $quantity = $this->_getOrderUSDQuantity();
+        $quantity = Redis::get($this->primaryKey . '_buy_order_quantity');
+        if (empty($quantity)) {
+            $quantity = $this->_getOrderUSDQuantity();
+        }
         $res = $this->bitmex->createLimitOrder($quantity, $price);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
@@ -169,13 +175,12 @@ class BitMexStrategyService
             return self::STATUS_NOT_BUY_NOT_SELL;
         } elseif ($sellIsNull) { //有买单id
             $buyOrder = $this->bitmex->getOrder($buyOrderValue);
-            dd($buyOrder);
             if (!$buyOrder) {
                 Log::error($this->bitmex->errorMessage);
                 goto ERROR;
             }
             // 买单未完成
-            if (strtolower($buyOrder['ordStatus']) != '') {
+            if (strtolower($buyOrder['ordStatus']) != self::ORDER_STATUS_FILLED) {
                 return self::STATUS_HAS_BUY_NOT_FINISHED;
             }
             // 买单已完成,记录买单价格,删除买单key
@@ -188,8 +193,9 @@ class BitMexStrategyService
                 Log::error($this->bitmex->errorMessage);
                 goto ERROR;
             }
+            dd($sellOrder);
             // 卖单未完成
-            if (strtolower($sellOrder['ordStatus']) != '') {
+            if (strtolower($sellOrder['ordStatus']) != self::ORDER_STATUS_FILLED) {
                 return self::STATUS_HAS_SELL_NOT_FINISHED;
             }
             // 卖单已完成,删除卖单key
