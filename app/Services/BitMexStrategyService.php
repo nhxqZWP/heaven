@@ -36,10 +36,9 @@ class BitMexStrategyService
         $this->primaryKey = $key;
         $envKey = $key . '_KEY';
         $envSecret = $key . '_SECRET';
-        dd(config('bitmex.'.$envKey));
         $this->bitmex = new BitMexApi(
-            config('bitmex.'.$envKey),
-            config('bitmex'.$envSecret)
+            config('auth.bitmex.'.$envKey),
+            config('auth.bitmex.'.$envSecret)
         );
     }
 
