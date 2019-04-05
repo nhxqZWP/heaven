@@ -21,6 +21,8 @@ class BitMexStrategyService
     const STATUS_HAS_BUY_FINISHED = 3;
     const STATUS_HAS_SELL_NOT_FINISHED = 4;
 
+    const ORDER_STATUS_NEW = 'new';
+
     private $primaryKey;
     private $bitmex;
 
@@ -59,41 +61,82 @@ class BitMexStrategyService
     {
         $status = $this->_getStatus();
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
-            $res = $this->bitmex->createLimitOrder(100, 4000);
+            $res = $this->_createLimitOrderByBook();
             if (!$res) {
-                dd($this->bitmex->errorMessage);
-                Log::error($this->bitmex->errorMessage);
+                goto ERROR;
             }
-            dd($res);
-
-        } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成单买单
-
+            $orderId = $res['orderID'];
+            Redis::set($this->_getBuyOrderKey(), $orderId);
+        } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成买单
+            Log::debug('has not finished buy order');
         } elseif ($status == self::STATUS_HAS_BUY_FINISHED) { //买单完成
-
+            $this->bitmex->createLimitOrder();
         } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
 
-        } else {
-            return null;
+        }
+
+        ERROR:
+        return null;
+    }
+
+    private function _createLimitOrderByBook()
+    {
+        $orderBook = $this->bitmex->getOrderBook(1);
+        dd($orderBook);
+        $res = $this->bitmex->createLimitOrder(100, 4000);
+        if (!$res) {
+            Log::error($this->bitmex->errorMessage);
         }
     }
 
     private function _getStatus()
     {
-        $buyOrderKey = $this->primaryKey . 'buy_order';
-        $sellOrderKey = $this->primaryKey . 'sell_order';
-        $buyOrderValue = Redis::get($buyOrderKey);
-        $sellOrderValue = Redis::get($sellOrderKey);
+        $buyOrderValue = Redis::get($this->_getBuyOrderKey());
+        $sellOrderValue = Redis::get($this->_getSellOrderKey());
         $buyIsNull = empty($buyOrderValue) ? true : false;
         $sellIsNull = empty($sellOrderValue) ? true : false;
         if ($buyIsNull && $sellIsNull) {
             return self::STATUS_NOT_BUY_NOT_SELL;
         } elseif ($sellIsNull) { //有买单id
             $buyOrder = $this->bitmex->getOrder($buyOrderValue);
+            dd($buyOrder);
+            if (!$buyOrder) {
+                Log::error($this->bitmex->errorMessage);
+                goto ERROR;
+            }
+            // 买单未完成
+            if (strtolower($buyOrder['ordStatus']) != '') {
+                return self::STATUS_HAS_BUY_NOT_FINISHED;
+            }
+            // 买单已完成,记录买单价格,删除买单key
+            $this->_setBuyOrderPrice($buyOrder['price']);
+            Redis::delete($this->_getBuyOrderKey());
         } else { // 有卖单id
             $sellOrder = $this->bitmex->getOrder($sellOrderValue);
         }
 
+        ERROR:
         return self::STATUS_INIT;
+    }
+
+    private function _getBuyOrderKey()
+    {
+        return $this->primaryKey . '_buy_order';
+    }
+
+    private function _getSellOrderKey()
+    {
+        return $this->primaryKey . '_sell_order';
+    }
+
+    private function _setBuyOrderPrice($price)
+    {
+        Redis::set($this->primaryKey . '_buy_order_price', $price);
+    }
+
+    private function _getBuyOrderPrice()
+    {
+        Redis::get($this->primaryKey . '_buy_order_price');
     }
 
 }

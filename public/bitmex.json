@@ -29,7 +29,39 @@
   "getOrder": {
 
   },
-  "": {
-
+  "createLimitOrder": {
+    "orderID" : "c8a5c7e3-57b7-85b4-b842-0a5bdb5bef5c",
+    "clOrdID" : "",
+    "clOrdLinkID" : "",
+    "account" : 761877,
+    "symbol" : "XBTUSD",
+    "side" : "Buy",
+    "simpleOrderQty" : null,
+    "orderQty" : 100,
+    "price" : 4000,
+    "displayQty" : null,
+    "stopPx" : null,
+    "pegOffsetValue" : null,
+    "pegPriceType" : "",
+    "currency" : "USD",
+    "settlCurrency" : "XBt",
+    "ordType" : "Limit",
+    "timeInForce" : "GoodTillCancel",
+    "execInst" : "",
+    "contingencyType" : "",
+    "exDestination" : "XBME",
+    "ordStatus" : "New",
+    "triggered" : "",
+    "workingIndicator" : true,
+    "ordRejReason" : "",
+    "simpleLeavesQty" : null,
+    "leavesQty" : 100,
+    "simpleCumQty" : null,
+    "cumQty" : 0,
+    "avgPx" : null,
+    "multiLegReportingType" : "SingleSecurity",
+    "text" : "Submitted via API.",
+    "transactTime" : "2019-04-05T14:46:32.829Z",
+    "timestamp" : "2019-04-05T14:46:32.829Z"
   }
 }
