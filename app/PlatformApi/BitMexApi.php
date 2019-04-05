@@ -609,7 +609,7 @@ class BitMexApi
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
             $headers[] = 'X-HTTP-Method-Override: PUT';
         }
-        dd($headers);
+
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER , false);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
