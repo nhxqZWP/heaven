@@ -61,21 +61,30 @@ class BitMexStrategyService
     {
         $status = $this->_getStatus();
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
-            $res = $this->_createLimitOrderByBook();
+            $res = $this->_createLimitBuyOrderByBook();
             if (!$res) {
                 goto ERROR;
             }
             $orderId = $res['orderID'];
             Redis::set($this->_getBuyOrderKey(), $orderId);
+            return null;
         } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成买单
             Log::debug('has not finished buy order');
+            return null;
         } elseif ($status == self::STATUS_HAS_BUY_FINISHED) { //买单完成
-            $this->bitmex->createLimitOrder();
+            $res = $this->_createLimitSellOrder();
+            if (!$res) {
+                goto ERROR;
+            }
+            $orderId = $res['orderID'];
+            Redis::set($this->_getSellOrderKey(), $orderId);
+            return null;
         } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
-
+            return null;
         }
 
         ERROR:
+        Log::error('出现init状态,程序运行出错');
         return null;
     }
 
@@ -99,7 +108,7 @@ class BitMexStrategyService
      *
      * @return bool|mixed
      */
-    private function _createLimitOrderByBook()
+    private function _createLimitBuyOrderByBook()
     {
         $orderBook = $this->bitmex->getOrderBook(1);
         if (!$orderBook) {
@@ -107,7 +116,19 @@ class BitMexStrategyService
             return false;
         }
         $price = $orderBook[1]['price']; //买单book的最高买单
-        $quantity = 10;  //买单量 几个usd
+        $quantity = $this->_getOrderUSDQuantity();  //买单量 几个usd
+        $res = $this->bitmex->createLimitOrder($quantity, $price);
+        if (!$res) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        return $res;
+    }
+
+    public function _createLimitSellOrder()
+    {
+        $price = -$this->_getBuyOrderPrice(); //此处买卖同价,卖单需要价格为负数！！
+        $quantity = $this->_getOrderUSDQuantity();
         $res = $this->bitmex->createLimitOrder($quantity, $price);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
@@ -137,9 +158,21 @@ class BitMexStrategyService
             }
             // 买单已完成,记录买单价格,删除买单key
             $this->_setBuyOrderPrice($buyOrder['price']);
-            Redis::delete($this->_getBuyOrderKey());
+            Redis::del($this->_getBuyOrderKey());
+            return self::STATUS_HAS_BUY_FINISHED;
         } else { // 有卖单id
             $sellOrder = $this->bitmex->getOrder($sellOrderValue);
+            if (!$sellOrder) {
+                Log::error($this->bitmex->errorMessage);
+                goto ERROR;
+            }
+            // 卖单未完成
+            if (strtolower($sellOrder['ordStatus']) != '') {
+                return self::STATUS_HAS_SELL_NOT_FINISHED;
+            }
+            // 卖单已完成,删除卖单key
+            Redis::del($this->_getSellOrderKey());
+            return self::STATUS_NOT_BUY_NOT_SELL;
         }
 
         ERROR:
@@ -163,7 +196,23 @@ class BitMexStrategyService
 
     private function _getBuyOrderPrice()
     {
-        Redis::get($this->primaryKey . '_buy_order_price');
+        $price = Redis::get($this->primaryKey . '_buy_order_price');
+        if (empty($price)) {
+            $orderBook = $this->bitmex->getOrderBook(1);
+            if (!$orderBook) {
+                Log::error($this->bitmex->errorMessage);
+                exit;
+            }
+            $price = $orderBook[0]['price']; //卖单最低价
+            Log::error('出错,卖单价格来自于市场挂单');
+        }
+
+        return $price;
+    }
+
+    private function _getOrderUSDQuantity()
+    {
+        return 20;
     }
 
 }

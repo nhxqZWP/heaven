@@ -27,7 +27,8 @@ class TestController extends Controller
 
     public function test(BitMexStrategyService $bitmexService)
     {
-        return $bitmexService->similarBuySellPrice();
+        $bitmexService->similarBuySellPrice();
+        return 'ok';
 //        return $this->getOrderBook();
     }
 
