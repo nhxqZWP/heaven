@@ -157,13 +157,12 @@ class BitMexStrategyService
 
     public function _createLimitSellOrder()
     {
-        $price = -$this->_getBuyOrderPrice(); //此处买卖同价,卖单需要价格为负数！！
+        $price = $this->_getBuyOrderPrice();
         $quantity = Redis::get($this->primaryKey . '_buy_order_quantity');
         if (empty($quantity)) {
             $quantity = $this->_getOrderUSDQuantity();
         }
-        Log::debug($price);
-        $res = $this->bitmex->createLimitOrder($quantity, $price);
+        $res = $this->bitmex->createLimitOrder(-$quantity, $price);//此处买卖同价,数量为负数
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
             return false;

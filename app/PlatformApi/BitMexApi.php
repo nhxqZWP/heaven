@@ -353,7 +353,7 @@ class BitMexApi
      * Create new limit order
      *
      * @param $price number of contracts
-     * @param $quantity (number of contracts) positive for buy and negative for sell 买入为正，卖出为负
+     * @param $quantity (number of contracts) positive for buy and negative for sell 订单量买入为正，卖出为负
      * @param $maker forces platform to complete your order as a 'maker' only
      *
      * @return new order array
