@@ -12,8 +12,8 @@ namespace App\PlatformApi;
 class BitMexApi
 {
     //exploer https://www.bitmex.com/api/explorer 所有接口
-    const API_URL = 'https://testnet.bitmex.com';
-//    const API_URL = 'https://www.bitmex.com';
+//    const API_URL = 'https://testnet.bitmex.com';
+    const API_URL = 'https://www.bitmex.com';
     const API_PATH = '/api/v1/';
     const SYMBOL = 'XBTUSD';
 
