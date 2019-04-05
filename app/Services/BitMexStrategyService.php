@@ -10,9 +10,16 @@ namespace App\Services;
 
 
 use App\PlatformApi\BitMexApi;
+use Illuminate\Support\Facades\Redis;
 
 class BitMexStrategyService
 {
+    const STATUS_INIT = 0;
+    const STATUS_NOT_BUY_NOT_SELL = 1;
+    const STATUS_HAS_BUY_NOT_FINISHED = 2;
+    const STATUS_HAS_BUY_FINISHED = 3;
+    const STATUS_HAS_SELL_NOT_FINISHED = 4;
+
     private $primaryKey;
     private $bitmex;
 
@@ -35,8 +42,8 @@ class BitMexStrategyService
      *            |                             |
      *            ----买单3分钟不成交,重下买单     ----卖单6分钟不成交,取当前卖单深度价
      *
-     * null                         状态0
-     * 无买单id,无卖单id        -->  状态1
+     * null                        状态0
+     * 无买单id,无卖单id       -->   状态1
      * 下买单 买单下成功        -->  状态2
      * 有买单id,查询状态,如果成交-->  状态3
      * 下卖单 卖单下成功        -->  状态4
@@ -49,7 +56,38 @@ class BitMexStrategyService
      */
     public function similarBuySellPrice()
     {
+        $status = $this->_getStatus();
+        if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
+            dd(1);
 
+        } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成单买单
+
+        } elseif ($status == self::STATUS_HAS_BUY_FINISHED) { //买单完成
+
+        } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
+
+        } else {
+            return null;
+        }
+    }
+
+    private function _getStatus()
+    {
+        $buyOrderKey = $this->primaryKey . 'buy_order';
+        $sellOrderKey = $this->primaryKey . 'sell_order';
+        $buyOrderValue = Redis::get($buyOrderKey);
+        $sellOrderValue = Redis::get($sellOrderKey);
+        $buyIsNull = empty($buyOrderValue) ? true : false;
+        $sellIsNull = empty($sellOrderValue) ? true : false;
+        if ($buyIsNull && $sellIsNull) {
+            return self::STATUS_NOT_BUY_NOT_SELL;
+        } elseif ($sellIsNull) { //有买单id
+            $buyOrder = $this->bitmex->getOrder($buyOrderValue);
+        } else { // 有卖单id
+            $sellOrder = $this->bitmex->getOrder($sellOrderValue);
+        }
+
+        return self::STATUS_INIT;
     }
 
 }

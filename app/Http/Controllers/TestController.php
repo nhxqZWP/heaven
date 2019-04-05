@@ -10,7 +10,9 @@ namespace App\Http\Controllers;
 
 
 use App\PlatformApi\BitMexApi;
+use App\Services\BitMexStrategyService;
 use Exception;
+use Illuminate\Support\Facades\Redis;
 
 class TestController extends Controller
 {
@@ -23,9 +25,10 @@ class TestController extends Controller
         );
     }
 
-    public function test()
+    public function test(BitMexStrategyService $bitmexService)
     {
-        return $this->getOrderBook();
+        return $bitmexService->similarBuySellPrice();
+//        return $this->getOrderBook();
     }
 
     // 获取现价
