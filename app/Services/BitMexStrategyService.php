@@ -120,7 +120,7 @@ class BitMexStrategyService
         }
 
         ERROR:
-        Log::error('出现init状态,请看上句log');
+        Log::error('出现error状态,请看上句log');
         return null;
     }
 
