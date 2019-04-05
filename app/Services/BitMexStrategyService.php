@@ -79,14 +79,41 @@ class BitMexStrategyService
         return null;
     }
 
+    /**
+     * orderBook:
+     * [
+        [
+            "symbol" => "XBTUSD",
+            "id" => 8799503100,
+            "side" => "Sell",
+            "size" => 1547213,
+            "price" => 4969,
+        ],
+            "symbol" => "XBTUSD",
+            "id" => 8799503150,
+            "side" => "Buy",
+            "size" => 30487,
+            "price" => 4968.5,
+        ]
+     * ]
+     *
+     * @return bool|mixed
+     */
     private function _createLimitOrderByBook()
     {
         $orderBook = $this->bitmex->getOrderBook(1);
-        dd($orderBook);
-        $res = $this->bitmex->createLimitOrder(100, 4000);
+        if (!$orderBook) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        $price = $orderBook[1]['price']; //买单book的最高买单
+        $quantity = 10;  //买单量 几个usd
+        $res = $this->bitmex->createLimitOrder($quantity, $price);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
+            return false;
         }
+        return $res;
     }
 
     private function _getStatus()
