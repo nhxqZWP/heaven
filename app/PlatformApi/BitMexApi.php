@@ -581,7 +581,8 @@ class BitMexApi
             $params = http_build_query($data['params']);
         }
         elseif($method == "DELETE") {
-            $params = json_encode($data['params']);
+//            $params = json_encode($data['params']);
+            $params = http_build_query($data['params']);
         }
         $path = self::API_PATH . $function;
         $url = self::API_URL . self::API_PATH . $function;
