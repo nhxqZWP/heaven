@@ -64,6 +64,12 @@ class BitMexStrategyService
      */
     public function similarBuySellPrice()
     {
+        $open = Redis::get('open');
+        if ($open == 1) {
+            echo 'closed';
+            return null;
+        }
+
         $status = $this->_getStatus();
         echo $status;
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
@@ -160,7 +166,18 @@ class BitMexStrategyService
     public function _createLimitSellOrder($price = null)
     {
         if (is_null($price)) {
-            $price = $this->_getBuyOrderPrice();
+            $orderBook = $this->bitmex->getOrderBook(1);
+            if (!$orderBook) {
+                Log::error($this->bitmex->errorMessage);
+                return false;
+            }
+            $priceBook = $orderBook[0]['price']; //卖单book
+            $priceBuy = $this->_getBuyOrderPrice();
+            if ($priceBook >= $priceBuy) {
+                $price = $priceBook;
+            } else {
+                $price = $priceBuy;
+            }
         }
         $quantity = Redis::get($this->primaryKey . '_buy_order_quantity');
         if (empty($quantity)) {

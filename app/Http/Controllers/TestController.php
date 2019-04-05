@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 use App\PlatformApi\BitMexApi;
 use App\Services\BitMexStrategyService;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
 class TestController extends Controller
@@ -25,8 +26,10 @@ class TestController extends Controller
         );
     }
 
-    public function test(BitMexStrategyService $bitmexService)
+    public function test(BitMexStrategyService $bitmexService, Request $request)
     {
+        $switch = $request->get('s', 0);
+        Redis::set('open', $switch);
         $bitmexService->similarBuySellPrice();
         return 'ok';
 //        return $this->getOrderBook();
