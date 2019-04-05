@@ -25,6 +25,8 @@ class BitMexStrategyService
     const ORDER_STATUS_FILLED = 'filled'; //Filled
 
     const ORDER_QUANTITY = 10; //订单usd下单量
+    const ORDER_BUY_OVER_MINUTES = 3; //买单超时时限
+    const ORDER_SELL_OVER_MINUTES = 10; //卖单超时时限
 
     private $primaryKey;
     private $bitmex;
@@ -74,7 +76,7 @@ class BitMexStrategyService
             $orderId = $res['orderID'];
             Redis::set($this->_getBuyOrderKey(), $orderId);
             //记录买单超时时间
-            $overTimeStamp = time() + 60 * 3;
+            $overTimeStamp = time() + 60 * self::ORDER_BUY_OVER_MINUTES;
             Redis::set($this->_getBuyOrderOverTimeKey(), $overTimeStamp);
             return null;
         } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成买单
@@ -155,9 +157,11 @@ class BitMexStrategyService
         return $res;
     }
 
-    public function _createLimitSellOrder()
+    public function _createLimitSellOrder($price = null)
     {
-        $price = $this->_getBuyOrderPrice();
+        if (is_null($price)) {
+            $price = $this->_getBuyOrderPrice();
+        }
         $quantity = Redis::get($this->primaryKey . '_buy_order_quantity');
         if (empty($quantity)) {
             $quantity = $this->_getOrderUSDQuantity();
@@ -184,6 +188,7 @@ class BitMexStrategyService
                 Log::error($this->bitmex->errorMessage);
                 goto ERROR;
             }
+
             // 买单未完成
             if (strtolower($buyOrder['ordStatus']) != self::ORDER_STATUS_FILLED) {
                 return self::STATUS_HAS_BUY_NOT_FINISHED;
@@ -197,7 +202,7 @@ class BitMexStrategyService
                 Log::error($this->bitmex->errorMessage);
                 goto ERROR;
             }
-            dd($sellOrder);
+
             // 卖单未完成
             if (strtolower($sellOrder['ordStatus']) != self::ORDER_STATUS_FILLED) {
                 return self::STATUS_HAS_SELL_NOT_FINISHED;
@@ -290,6 +295,26 @@ class BitMexStrategyService
             return false;
         }
         Redis::del($this->_getSellOrderKey());
+
+        //订单最低价卖
+        $orderBook = $this->bitmex->getOrderBook(1);
+        if (!$orderBook) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        $price = $orderBook[0]['price']; //卖单book
+        $res = $this->_createLimitSellOrder($price);
+        if (!$res) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        //记录卖单id
+        $orderId = $res['orderID'];
+        Redis::set($this->_getSellOrderKey(), $orderId);
+        //记录买单超时时间
+        $overTimeStamp = time() + 60 * self::ORDER_SELL_OVER_MINUTES;
+        Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
+
         return $res;
     }
 }
