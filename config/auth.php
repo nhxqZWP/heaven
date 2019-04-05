@@ -99,4 +99,9 @@ return [
         ],
     ],
 
+    'bitmex' => [
+        'BM1_KEY' => env('BM1_KEY'),
+        'BM1_SECRET' => env('BM1_SECRET'),
+    ]
+
 ];
