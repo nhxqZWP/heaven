@@ -10,6 +10,7 @@ namespace App\Services;
 
 
 use App\PlatformApi\BitMexApi;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class BitMexStrategyService
@@ -59,6 +60,10 @@ class BitMexStrategyService
         $status = $this->_getStatus();
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
             $res = $this->bitmex->createLimitOrder(100, 4900);
+            if (!$res) {
+                dd($this->bitmex->errorMessage);
+                Log::error($this->bitmex->errorMessage);
+            }
             dd($res);
 
         } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成单买单
