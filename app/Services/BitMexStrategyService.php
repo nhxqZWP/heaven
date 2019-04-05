@@ -160,6 +160,7 @@ class BitMexStrategyService
         if (empty($quantity)) {
             $quantity = $this->_getOrderUSDQuantity();
         }
+        Log::debug($price);
         $res = $this->bitmex->createLimitOrder($quantity, $price);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
