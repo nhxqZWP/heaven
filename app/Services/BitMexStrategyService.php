@@ -58,7 +58,8 @@ class BitMexStrategyService
     {
         $status = $this->_getStatus();
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
-            dd(1);
+            $res = $this->bitmex->createLimitOrder(100, 4900);
+            dd($res);
 
         } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成单买单
 
