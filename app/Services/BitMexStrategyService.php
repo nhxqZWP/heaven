@@ -25,7 +25,7 @@ class BitMexStrategyService
     const ORDER_STATUS_FILLED = 'filled'; //Filled
 
     const ORDER_QUANTITY = 500; //订单usd下单量
-    const ORDER_BUY_OVER_MINUTES = 1; //买单超时时限
+    const ORDER_BUY_OVER_MINUTES = 2; //买单超时时限
     const ORDER_SELL_OVER_MINUTES = 10; //卖单超时时限
 
     private $primaryKey;
