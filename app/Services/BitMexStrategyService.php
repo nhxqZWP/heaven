@@ -65,21 +65,43 @@ class BitMexStrategyService
             if (!$res) {
                 goto ERROR;
             }
+
+            //记录买单id
             $orderId = $res['orderID'];
             Redis::set($this->_getBuyOrderKey(), $orderId);
+            //记录买单超时时间
+            $overTimeStamp = time() + 60 * 3;
+            Redis::set($this->_getBuyOrderOverTimeKey(), $overTimeStamp);
             return null;
         } elseif ($status == self::STATUS_HAS_BUY_NOT_FINISHED) { //有未完成买单
-            Log::debug('has not finished buy order');
+            $isOverTime = $this->_isOverBuyOrderTime();
+            if ($isOverTime) { //超时取消买单
+                $res = $this->_cancelBuyOrder();
+                if (!$res) {
+                    goto ERROR;
+                }
+            }
             return null;
         } elseif ($status == self::STATUS_HAS_BUY_FINISHED) { //买单完成
             $res = $this->_createLimitSellOrder();
             if (!$res) {
                 goto ERROR;
             }
+            //记录卖单id
             $orderId = $res['orderID'];
             Redis::set($this->_getSellOrderKey(), $orderId);
+            //记录买单超时时间
+            $overTimeStamp = time() + 60 * 6;
+            Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
             return null;
         } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
+            $isOverTime = $this->_isOverSellOrderTime();
+            if ($isOverTime) { //超时取消卖单
+                $res = $this->_cancelSellOrder();
+                if (!$res) {
+                    goto ERROR;
+                }
+            }
             return null;
         }
 
@@ -215,4 +237,47 @@ class BitMexStrategyService
         return 20;
     }
 
+    private function _getBuyOrderOverTimeKey()
+    {
+        return $this->primaryKey . '_buy_order_overtime';
+    }
+
+    private function _getSellOrderOverTimeKey()
+    {
+        return $this->primaryKey . '_sell_order_overtime';
+    }
+
+    private function _isOverBuyOrderTime()
+    {
+        $time = Redis::get($this->_getBuyOrderOverTimeKey());
+        return time() > $time ? true : false;
+    }
+
+    private function _isOverSellOrderTime()
+    {
+        $time = Redis::get($this->_getSellOrderOverTimeKey());
+        return time() > $time ? true : false;
+    }
+
+    private function _cancelBuyOrder()
+    {
+        $res = $this->bitmex->cancelOrder($this->_getBuyOrderKey());
+        if (!$res) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        Redis::del($this->_getBuyOrderKey());
+        return $res;
+    }
+
+    private function _cancelSellOrder()
+    {
+        $res = $this->bitmex->cancelOrder($this->_getSellOrderKey());
+        if (!$res) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        Redis::del($this->_getSellOrderKey());
+        return $res;
+    }
 }

@@ -461,6 +461,22 @@ class BitMexApi
         return $this->authQuery($data);
     }
 
+    /**
+     * 取消单一订单
+     * @param string $orderId
+     * @return bool|mixed
+     */
+    public function cancelOrder($orderId = "")
+    {
+        $data['method'] = "DELETE";
+        $data['function'] = "order";
+        $data['params'] = array(
+            "orderID" => $orderId,
+        );
+
+        return $this->authQuery($data);
+    }
+
     /*
      * Get Wallet
      *
