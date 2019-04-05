@@ -507,7 +507,7 @@ class BitMexApi
      * @return array
      */
 
-    public function getOrderBook($depth = 25) {
+    public function getOrderBook($depth = 5) {
 
         $symbol = self::SYMBOL;
         $data['method'] = "GET";
