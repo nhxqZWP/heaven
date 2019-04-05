@@ -23,7 +23,7 @@ class BitMexStrategyService
     private $primaryKey;
     private $bitmex;
 
-    private function __construct($key = 'BM1')
+    public function __construct($key = 'BM1')
     {
         $this->primaryKey = $key;
         $envKey = $key . 'KEY';
