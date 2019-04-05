@@ -294,6 +294,19 @@ class BitMexStrategyService
     private function _cancelBuyOrder()
     {
         $orderId = Redis::get($this->_getBuyOrderKey());
+
+        $buyOrder = $this->bitmex->getOrder($orderId);
+        if (!$buyOrder) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        // 买单部分成交 无法取消
+        if (strtolower($buyOrder['ordStatus']) != self::ORDER_STATUS_FILLED && strtolower($buyOrder['ordStatus']) != self::ORDER_STATUS_NEW) {
+            Log::debug('买单部分完成,无法取消');
+            return false;
+        }
+
+        // 取消买单
         $res = $this->bitmex->cancelOrder($orderId);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
@@ -306,6 +319,18 @@ class BitMexStrategyService
     private function _cancelSellOrder()
     {
         $orderId = Redis::get($this->_getSellOrderKey());
+
+        $sellOrder = $this->bitmex->getOrder($orderId);
+        if (!$sellOrder) {
+            Log::error($this->bitmex->errorMessage);
+            return false;
+        }
+        // 卖单部分成交 无法取消
+        if (strtolower($sellOrder['ordStatus']) != self::ORDER_STATUS_FILLED && strtolower($sellOrder['ordStatus']) != self::ORDER_STATUS_NEW) {
+            Log::debug('卖单部分完成,无法取消');
+            return false;
+        }
+
         $res = $this->bitmex->cancelOrder($orderId);
         if (!$res) {
             Log::error($this->bitmex->errorMessage);
@@ -313,7 +338,7 @@ class BitMexStrategyService
         }
         Redis::del($this->_getSellOrderKey());
 
-        //订单最低价卖
+        //订单最低价重新挂卖单卖
         $orderBook = $this->bitmex->getOrderBook(1);
         if (!$orderBook) {
             Log::error($this->bitmex->errorMessage);
