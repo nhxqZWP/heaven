@@ -63,6 +63,7 @@ class BitMexStrategyService
     public function similarBuySellPrice()
     {
         $status = $this->_getStatus();
+        echo $status;
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
             $res = $this->_createLimitBuyOrderByBook();
             if (!$res) {
