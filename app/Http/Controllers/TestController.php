@@ -18,14 +18,14 @@ class TestController extends Controller
     public function __construct()
     {
         $this->client = new BitMexApi(
-            'DQxJ-9ShAv9Ev3kJwX_1afAj',
-            'IUyx0qUYn7B27Qyqn9-T6HGOfKuZuu9LJ7nSQbKKs52fdmFp'
+            env('BM1_KEY'),
+            env('BM1_SECRET')
         );
     }
 
     public function test()
     {
-        return $this->createLimitOrder();
+        return $this->getWallet();
     }
 
     // 获取现价
@@ -85,6 +85,15 @@ class TestController extends Controller
     public function createLimitOrder()
     {
         $res = $this->client->createLimitOrder(1, 4000);
+        if (!$res) {
+            dd($this->client->errorMessage);
+        }
+        dd($res);
+    }
+
+    public function getWallet()
+    {
+        $res = $this->client->getWallet();
         if (!$res) {
             dd($this->client->errorMessage);
         }
