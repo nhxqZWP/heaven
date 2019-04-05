@@ -91,6 +91,8 @@ class BitMexStrategyService
             if (!$res) {
                 goto ERROR;
             }
+            //卖单完成才删除买单id
+            Redis::del($this->_getBuyOrderKey());
             //记录卖单id
             $orderId = $res['orderID'];
             Redis::set($this->_getSellOrderKey(), $orderId);
@@ -187,9 +189,8 @@ class BitMexStrategyService
             if (strtolower($buyOrder['ordStatus']) != self::ORDER_STATUS_FILLED) {
                 return self::STATUS_HAS_BUY_NOT_FINISHED;
             }
-            // 买单已完成,记录买单价格,删除买单key
+            // 买单已完成,记录买单价格
             $this->_setBuyOrderPrice($buyOrder['price']);
-            Redis::del($this->_getBuyOrderKey());
             return self::STATUS_HAS_BUY_FINISHED;
         } else { // 有卖单id
             $sellOrder = $this->bitmex->getOrder($sellOrderValue);
