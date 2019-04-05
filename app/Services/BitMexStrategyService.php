@@ -24,6 +24,8 @@ class BitMexStrategyService
     const ORDER_STATUS_NEW = 'new'; //New
     const ORDER_STATUS_FILLED = 'filled'; //Filled
 
+    const ORDER_QUANTITY = 10; //订单usd下单量
+
     private $primaryKey;
     private $bitmex;
 
@@ -146,7 +148,7 @@ class BitMexStrategyService
             return false;
         }
         //记录买单量
-        Redis::set($this->primaryKey . '_buy_order_quantity');
+        Redis::set($this->primaryKey . '_buy_order_quantity', $res['orderQty']);
         return $res;
     }
 
@@ -240,7 +242,7 @@ class BitMexStrategyService
 
     private function _getOrderUSDQuantity()
     {
-        return 20;
+        return self::ORDER_QUANTITY;
     }
 
     private function _getBuyOrderOverTimeKey()
