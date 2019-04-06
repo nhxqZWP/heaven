@@ -151,9 +151,7 @@ class BitMexStrategyService
             Log::error($this->bitmex->errorMessage);
             return false;
         }
-        $price = $orderBook[1]['price'] + 0.2; //买单book的最高买单
-        $price = round($price, 1);
-        Log::debug($price);
+        $price = $orderBook[1]['price']; //买单book的最高买单
         $quantity = $this->_getOrderUSDQuantity();  //买单量 几个usd
         $res = $this->bitmex->createLimitOrder($quantity, $price);
         if (!$res) {
