@@ -26,7 +26,7 @@ class BitMexStrategyService
 
     const ORDER_QUANTITY = 500; //订单usd下单量
     const ORDER_BUY_OVER_MINUTES = 2; //买单超时时限
-    const ORDER_SELL_OVER_MINUTES = 10; //卖单超时时限
+    const ORDER_SELL_OVER_MINUTES = 20; //卖单超时时限
 
     private $primaryKey;
     private $bitmex;
@@ -48,7 +48,7 @@ class BitMexStrategyService
      * 状态划分：
      * ----无买卖单,下买单----买单成交,下不低于买单价的卖单----卖单成交,清空状态----
      *            |                             |
-     *            ----买单1分钟不成交,重下买单     ----卖单10分钟不成交,取当前卖单深度价
+     *            ----买单2分钟不成交,重下买单     ----卖单20分钟不成交,取当前卖单深度价
      *
      * null                        状态0
      * 无买单id,无卖单id       -->   状态1
@@ -57,8 +57,8 @@ class BitMexStrategyService
      * 下卖单 卖单下成功        -->  状态4
      * 有卖单id,查询状态,如果成交-->  状态1
      *
-     * 状态2计时1分钟,超时如果部分成交则不取消,15分钟未全部成交则取消,标记状态1,重新下买单
-     * 状态4计时10分钟,超时如果部分成交则不取消,30分钟未全部成交则取消,标记状态3,重新下卖单
+     * 状态2计时2分钟,超时如果部分成交则不取消,2分钟未全部成交则取消,标记状态1,重新下买单
+     * 状态4计时20分钟,超时如果部分成交则不取消,20分钟未全部成交则取消,标记状态3,重新下当前市场book卖单
      *
      *
      */
