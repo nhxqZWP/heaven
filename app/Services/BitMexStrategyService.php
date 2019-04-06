@@ -151,7 +151,7 @@ class BitMexStrategyService
             Log::error($this->bitmex->errorMessage);
             return false;
         }
-        $price = $orderBook[1]['price']; //买单book的最高买单
+        $price = $orderBook[1]['price']; //买单book的最高买单 需要是0.5的倍数
         $quantity = $this->_getOrderUSDQuantity();  //买单量 几个usd
         $res = $this->bitmex->createLimitOrder($quantity, $price);
         if (!$res) {
