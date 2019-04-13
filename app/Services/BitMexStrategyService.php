@@ -25,8 +25,9 @@ class BitMexStrategyService
     const ORDER_STATUS_FILLED = 'filled'; //Filled
 
     const ORDER_QUANTITY = 500; //订单usd下单量
-    const ORDER_BUY_OVER_MINUTES = 2; //买单超时时限
-    const ORDER_SELL_OVER_MINUTES = 20; //卖单超时时限
+    const ORDER_BUY_OVER_MINUTES = 5; //买单超时时限
+    const ORDER_SELL_OVER_MINUTES = 20; //卖单超时时限 暂不用
+    const ORDER_SELL_OVER_RATE = 0.03; //卖单止损百分比
 
     private $primaryKey;
     private $bitmex;
@@ -58,20 +59,20 @@ class BitMexStrategyService
      * 有卖单id,查询状态,如果成交-->  状态1
      *
      * 状态2计时2分钟,超时如果部分成交则不取消,2分钟未全部成交则取消,标记状态1,重新下买单
-     * 状态4计时20分钟,超时如果部分成交则不取消,20分钟未全部成交则取消,标记状态3,重新下当前市场book卖单
+     * 状态4计时20分钟,超时如果部分成交则不取消,超过止损点则取消卖单,标记状态3,重新下当前市场book卖单
      *
      *
      */
     public function similarBuySellPrice()
     {
-        $open = Redis::get('open');
-        if ($open == 1) {
+        $close = Redis::get('close');
+        if ($close == 1) {
             echo 'closed';
             return null;
         }
 
         $status = $this->_getStatus();
-        echo $status;
+//        echo $status;
         if ($status == self::STATUS_NOT_BUY_NOT_SELL) { //无买单 无卖单
             $res = $this->_createLimitBuyOrderByBook();
             if (!$res) {
@@ -104,9 +105,12 @@ class BitMexStrategyService
             //记录卖单id
             $orderId = $res['orderID'];
             Redis::set($this->_getSellOrderKey(), $orderId);
-            //记录买单超时时间
-            $overTimeStamp = time() + 60 * 10;
-            Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
+//            记录买单超时时间
+//            $overTimeStamp = time() + 60 * 10;
+//            Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
+            //记录卖单止损价
+            $stopPrice = 0;
+            Redis::set($this->_getSellOrderStopPriceKey(), $stopPrice);
             return null;
         } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
             $isOverTime = $this->_isOverSellOrderTime();
@@ -249,6 +253,11 @@ class BitMexStrategyService
         Redis::set($this->primaryKey . '_buy_order_price', $price);
     }
 
+    private function _getSellOrderStopPriceKey()
+    {
+        return $this->primaryKey . '_sell_order_stop_price';
+    }
+
     private function _getBuyOrderPrice()
     {
         $price = Redis::get($this->primaryKey . '_buy_order_price');
@@ -290,6 +299,12 @@ class BitMexStrategyService
     {
         $time = Redis::get($this->_getSellOrderOverTimeKey());
         return time() > $time ? true : false;
+    }
+
+    private function _isOverSellOrderStopLimitPrice()
+    {
+        $stopPrice = Redis::get($this->_getSellOrderStopPriceKey());
+
     }
 
     private function _cancelBuyOrder()

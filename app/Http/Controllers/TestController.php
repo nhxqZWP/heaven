@@ -28,11 +28,17 @@ class TestController extends Controller
 
     public function test(BitMexStrategyService $bitmexService, Request $request)
     {
+        $this->getTicker();
         $switch = $request->get('s', 0);
-        Redis::set('open', $switch);
-        $bitmexService->similarBuySellPrice();
-        return 'ok';
-//        return $this->getOrderBook();
+        Redis::set('close', $switch);
+//        $bitmexService->similarBuySellPrice();
+        $close = Redis::get('close');
+        $switch = '运行中';
+        if ($close === 1) {
+            $switch = '已关闭';
+        }
+
+        return $switch;
     }
 
     // 获取现价
