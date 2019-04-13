@@ -27,7 +27,7 @@ class BitMexStrategyService
     const ORDER_QUANTITY = 500; //订单usd下单量
     const ORDER_BUY_OVER_MINUTES = 5; //买单超时时限
     const ORDER_SELL_OVER_MINUTES = 20; //卖单超时时限 暂不用
-    const ORDER_SELL_OVER_RATE = 0.05; //卖单相对买单止损百分比
+    const ORDER_SELL_OVER_RATE = 0.04; //卖单相对买单止损百分比
     const ORDER_SELL_VOER_RATE_TO_SELL = 0.03; //卖单相对卖单止损百分比
 
     private $primaryKey;
@@ -317,7 +317,7 @@ class BitMexStrategyService
     {
         $stopPrice = Redis::get($this->_getSellOrderStopPriceKey());
         $nowPrice = $this->bitmex->getTicker()['last'];
-        if ($nowPrice < $stopPrice) {
+        if (intval($nowPrice) < intval($stopPrice)) {
             return true;
         }
         return false;
