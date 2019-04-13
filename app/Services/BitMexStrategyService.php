@@ -27,7 +27,8 @@ class BitMexStrategyService
     const ORDER_QUANTITY = 500; //订单usd下单量
     const ORDER_BUY_OVER_MINUTES = 5; //买单超时时限
     const ORDER_SELL_OVER_MINUTES = 20; //卖单超时时限 暂不用
-    const ORDER_SELL_OVER_RATE = 0.03; //卖单止损百分比
+    const ORDER_SELL_OVER_RATE = 0.03; //卖单相对买单止损百分比
+    const ORDER_SELL_VOER_RATE_TO_SELL = 0.01; //卖单相对卖单止损百分比
 
     private $primaryKey;
     private $bitmex;
@@ -109,12 +110,12 @@ class BitMexStrategyService
 //            $overTimeStamp = time() + 60 * 10;
 //            Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
             //记录卖单止损价
-            $stopPrice = 0;
-            Redis::set($this->_getSellOrderStopPriceKey(), $stopPrice);
+            $this->_setOverSellOrderStopPrice($this->_getBuyOrderPrice());
             return null;
         } elseif ($status == self::STATUS_HAS_SELL_NOT_FINISHED) {//有未完成的卖单
-            $isOverTime = $this->_isOverSellOrderTime();
-            if ($isOverTime) { //超时取消卖单
+//            $isOverTime = $this->_isOverSellOrderTime();
+            $isOverStopLose = $this->_isOverSellOrderStopLimitPrice();
+            if ($isOverStopLose) { //止损取消卖单 重下卖单
                 $res = $this->_cancelSellOrder();
                 if (!$res) {
                     goto ERROR;
@@ -301,10 +302,25 @@ class BitMexStrategyService
         return time() > $time ? true : false;
     }
 
+    //设置卖单止损价
+    private function _setOverSellOrderStopPrice($buyPrice = null)
+    {
+        if (is_null($buyPrice)) {
+            $stopPrice = $this->bitmex->getTicker()['last'] * (1 - self::ORDER_SELL_VOER_RATE_TO_SELL);
+        } else {
+            $stopPrice = $buyPrice * (1 - self::ORDER_SELL_OVER_RATE);
+        }
+        Redis::set($this->_getSellOrderStopPriceKey(), intval($stopPrice));
+    }
+
     private function _isOverSellOrderStopLimitPrice()
     {
         $stopPrice = Redis::get($this->_getSellOrderStopPriceKey());
-
+        $nowPrice = $this->bitmex->getTicker()['last'];
+        if ($nowPrice < $stopPrice) {
+            return true;
+        }
+        return false;
     }
 
     private function _cancelBuyOrder()
@@ -369,9 +385,11 @@ class BitMexStrategyService
         //记录卖单id
         $orderId = $res['orderID'];
         Redis::set($this->_getSellOrderKey(), $orderId);
-        //记录买单超时时间
-        $overTimeStamp = time() + 60 * self::ORDER_SELL_OVER_MINUTES;
-        Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
+//        记录卖单超时时间
+//        $overTimeStamp = time() + 60 * self::ORDER_SELL_OVER_MINUTES;
+//        Redis::set($this->_getSellOrderOverTimeKey(), $overTimeStamp);
+        //记录卖单止损价
+        $this->_setOverSellOrderStopPrice();
 
         return $res;
     }
