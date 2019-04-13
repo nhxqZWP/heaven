@@ -33,7 +33,7 @@ class TestController extends Controller
 //        $bitmexService->similarBuySellPrice();
         $close = Redis::get('close');
         $switch = '运行中';
-        if ($close === 1) {
+        if ($close == 1) {
             $switch = '已关闭';
         }
 
