@@ -27,9 +27,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
             $bitmexService = new BitMexStrategyService();
-            for ($i = 0; $i < 10; $i++) {
+            for ($i = 0; $i < 8; $i++) {
                 $bitmexService->similarBuySellPrice();
-                sleep(5);
+                sleep(6);
             }
         })->cron('* * * * *');
     }

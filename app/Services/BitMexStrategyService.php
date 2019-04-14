@@ -317,6 +317,10 @@ class BitMexStrategyService
     {
         $stopPrice = Redis::get($this->_getSellOrderStopPriceKey());
         $nowPrice = $this->bitmex->getTicker()['last'];
+        if ($nowPrice === false) {
+            return false;
+        }
+
         if (intval($nowPrice) < intval($stopPrice)) {
             return true;
         }

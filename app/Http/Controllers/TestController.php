@@ -28,8 +28,6 @@ class TestController extends Controller
 
     public function test(BitMexStrategyService $bitmexService, Request $request)
     {
-        $orderId = Redis::get('BM1_sell_order');
-        dd($this->client->getOrder($orderId));
         $switch = $request->get('s', 0);
         Redis::set('close', $switch);
 //        $bitmexService->similarBuySellPrice();
