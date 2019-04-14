@@ -153,7 +153,10 @@ class BitMexApi
         );
 
         $orders = $this->authQuery($data);
-
+        if (empty($orders)) {
+            Log::debug('获取订单信息失败,订单：'.$orderID);
+            return false;
+        }
         foreach($orders as $order) {
             if($order['orderID'] == $orderID) {
                 return $order;
