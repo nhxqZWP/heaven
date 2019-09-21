@@ -12,7 +12,6 @@ return [
     | syntax for each one. Here you may set the default queue driver.
     |
     | Supported: "sync", "database", "beanstalkd", "sqs", "redis", "null"
-    |
     */
 
     'default' => env('QUEUE_DRIVER', 'sync'),
